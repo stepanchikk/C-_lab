@@ -1,0 +1,102 @@
+using System;
+
+namespace lab1
+{
+    class Program
+    {
+        static void Main()
+        {
+            // --- Завдання 1.3: Відстань між точками ---
+            Console.WriteLine("=== Завдання 1.3 ===");
+            Console.Write("Введіть координату a (x1): ");
+            double a = double.Parse(Console.ReadLine());
+            Console.Write("Введіть координату b (y1): ");
+            double b = double.Parse(Console.ReadLine());
+            Console.Write("Введіть координату c (x2): ");
+            double c = double.Parse(Console.ReadLine());
+            Console.Write("Введіть координату d (y2): ");
+            double d = double.Parse(Console.ReadLine());
+
+            double distance = Math.Sqrt(Math.Pow(c - a, 2) + Math.Pow(d - b, 2));
+            Console.WriteLine($"Відстань між точками: {distance}\n");
+
+            // --- Завдання 2.3: Перевірка на непарність ---
+            Console.WriteLine("=== Завдання 2.3 ===");
+            Console.Write("Введіть ціле число: ");
+            int num = int.Parse(Console.ReadLine());
+            if (num % 2 != 0)
+                Console.WriteLine("Так, задане число є непарним.\n");
+            else
+                Console.WriteLine("Ні, задане число є парним.\n");
+
+            // --- Завдання 3.3: Потрапляння точки в область ---
+            Console.WriteLine("=== Завдання 3.3 ===");
+            Console.Write("Введіть x: ");
+            double x = double.Parse(Console.ReadLine());
+            Console.Write("Введіть y: ");
+            double y = double.Parse(Console.ReadLine());
+
+            double r2 = x * x + y * y;
+
+            if (r2 > 9 && r2 < 64 && x > 0)
+            {
+                Console.WriteLine("Так (всередині)");
+            }
+            else if ((r2 == 64 && x >= 0) || (r2 == 9 && x >= 0) || (x == 0 && r2 >= 9 && r2 <= 64))
+            {
+                Console.WriteLine("На межі");
+            }
+            else
+            {
+                Console.WriteLine("Ні (поза областю)");
+            }
+            Console.WriteLine();
+
+            // --- Завдання 4.4: Назва карти ---
+            Console.WriteLine("=== Завдання 4.4 ===");
+            Console.Write("Введіть номер карти (від 6 до 14): ");
+            int k = int.Parse(Console.ReadLine());
+            switch (k)
+            {
+                case 6: Console.WriteLine("шістка"); break;
+                case 7: Console.WriteLine("сімка"); break;
+                case 8: Console.WriteLine("вісімка"); break;
+                case 9: Console.WriteLine("дев'ятка"); break;
+                case 10: Console.WriteLine("десятка"); break;
+                case 11: Console.WriteLine("валет"); break;
+                case 12: Console.WriteLine("дама"); break;
+                case 13: Console.WriteLine("король"); break;
+                case 14: Console.WriteLine("туз"); break;
+                default: Console.WriteLine("Помилка: номер карти поза межами 6-14."); break;
+            }
+            Console.WriteLine();
+
+            // --- Завдання 5.23: Куб різниці ---
+            Console.WriteLine("=== Завдання 5.23 ===");
+            Console.Write("Введіть перше дійсне число: ");
+            double num1 = double.Parse(Console.ReadLine());
+            Console.Write("Введіть друге дійсне число: ");
+            double num2 = double.Parse(Console.ReadLine());
+            Console.WriteLine($"Куб різниці: {CubeOfDifference(num1, num2)}\n");
+
+            // --- Завдання 6.8: Обчислення виразу ---
+            Console.WriteLine("=== Завдання 6.8 ===");
+            Console.Write("Введіть a: ");
+            double valA = double.Parse(Console.ReadLine());
+            Console.Write("Введіть b: ");
+            double valB = double.Parse(Console.ReadLine());
+
+            double result = (valA / (valA * valA + 1)) + (valB / (valB * valB + 1));
+            Console.WriteLine($"Результат виразу: {result}\n");
+
+            Console.WriteLine("Натисніть Enter для виходу...");
+            Console.ReadLine();
+        }
+
+        // --- Власна функція для Завдання 5.23 ---
+        static double CubeOfDifference(double a, double b)
+        {
+            return Math.Pow(a - b, 3);
+        }
+    }
+}
