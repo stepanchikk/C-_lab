@@ -1,0 +1,204 @@
+using System;
+
+namespace lab2
+{
+    public class Program
+    {
+        static void Main()
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.InputEncoding = System.Text.Encoding.UTF8;
+
+            // ==========================================
+            // ЗАВДАННЯ 1 (Одновимірний масив)
+            // Замінити всі від'ємні не кратні заданому числу елементи протилежни
+            // ==========================================
+            Console.WriteLine("=== ЗАВДАННЯ 1 ===");
+            int[] arr1 = Input1D();
+            Console.Write("Введіть число k (для перевірки на кратність): ");
+            int k = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Вихідний масив:");
+            Print1D(arr1);
+
+            Task1_ReplaceElements(arr1, k);
+
+            Console.WriteLine("Змінений масив:");
+            Print1D(arr1);
+
+
+            // ЗАВДАННЯ 2 (Двовимірний масив)
+            // Замінити всі мінімальні елементи на протилежн
+            Console.WriteLine("\n=== ЗАВДАННЯ 2 ===");
+            int n2, m2;
+            double[,] arr2 = Input2D(out n2, out m2);
+
+            Console.WriteLine("Вихідний масив:");
+            Print2D(arr2);
+
+            Task2_ReplaceMinWithOpposite(arr2);
+
+            Console.WriteLine("Змінений масив:");
+            Print2D(arr2);
+
+
+            // ==========================================
+            // ЗАВДАННЯ 3 (Двовимірний масив)
+            // Поміняти місцями сусідні рядки, якщо їх парна кількість
+            // ==========================================
+            Console.WriteLine("\n=== ЗАВДАННЯ 3 ===");
+            int n3, m3;
+            int[,] arr3 = Input2DInt(out n3, out m3);
+
+            Console.WriteLine("Вихідний масив:");
+            Print2DInt(arr3);
+
+            Task3_SwapRows2D(arr3);
+
+            Console.WriteLine("Змінений масив (Спосіб з 2D):");
+            Print2DInt(arr3);
+
+
+            Console.WriteLine("\nРоботу програми завершено. Натисніть Enter...");
+            Console.ReadLine();
+        }
+
+        public static void Task1_ReplaceElements(int[] arr, int k)
+        {
+            if (k == 0) return;
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i] < 0 && arr[i] % k != 0)
+                {
+                    arr[i] = -arr[i];
+                }
+            }
+        }
+
+        public static void Task2_ReplaceMinWithOpposite(double[,] arr)
+        {
+            if (arr.Length == 0) return;
+            int rows = arr.GetLength(0);
+            int cols = arr.GetLength(1);
+
+            double min = arr[0, 0];
+            foreach (double val in arr)
+            {
+                if (val < min) min = val;
+            }
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    if (Math.Abs(arr[i, j] - min) < double.Epsilon)
+                    {
+                        arr[i, j] = -arr[i, j];
+                    }
+                }
+            }
+        }
+
+        public static void Task3_SwapRows2D(int[,] arr)
+        {
+            int rows = arr.GetLength(0);
+            int cols = arr.GetLength(1);
+
+            if (rows % 2 != 0) return;
+
+            for (int i = 0; i < rows; i += 2)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    int temp = arr[i, j];
+                    arr[i, j] = arr[i + 1, j];
+                    arr[i + 1, j] = temp;
+                }
+            }
+        }
+
+        // ==========================================
+        // ДОПОМІЖНІ МЕТОДИ ДЛЯ ВВЕДЕННЯ/ВИВЕДЕННЯ
+        // ==========================================
+
+        static int[] Input1D()
+        {
+            Console.Write("Розмірність масиву n: ");
+            int n = int.Parse(Console.ReadLine());
+            int[] a = new int[n];
+            for (int i = 0; i < n; ++i)
+            {
+                Console.Write($"a[{i}]= ");
+                a[i] = int.Parse(Console.ReadLine());
+            }
+            return a;
+        }
+
+        static void Print1D(int[] a)
+        {
+            for (int i = 0; i < a.Length; ++i)
+                Console.Write("{0} ", a[i]);
+            Console.WriteLine();
+        }
+
+        static double[,] Input2D(out int n, out int m)
+        {
+            Console.WriteLine("Розмірність двовимірного масиву (дійсні числа):");
+            Console.Write("Кількість рядків n = ");
+            n = int.Parse(Console.ReadLine());
+            Console.Write("Кількість стовпців m = ");
+            m = int.Parse(Console.ReadLine());
+
+            double[,] a = new double[n, m];
+            for (int i = 0; i < n; ++i)
+            {
+                for (int j = 0; j < m; ++j)
+                {
+                    Console.Write($"a[{i},{j}]= ");
+                    a[i, j] = double.Parse(Console.ReadLine());
+                }
+            }
+            return a;
+        }
+
+        static void Print2D(double[,] a)
+        {
+            for (int i = 0; i < a.GetLength(0); ++i)
+            {
+                for (int j = 0; j < a.GetLength(1); ++j)
+                    Console.Write("{0,6:F1} ", a[i, j]);
+                Console.WriteLine();
+            }
+        }
+
+        static int[,] Input2DInt(out int n, out int m)
+        {
+            Console.WriteLine("Розмірність двовимірного масиву (цілі числа):");
+            Console.Write("Кількість рядків n = ");
+            n = int.Parse(Console.ReadLine());
+            Console.Write("Кількість стовпців m = ");
+            m = int.Parse(Console.ReadLine());
+
+            int[,] a = new int[n, m];
+            for (int i = 0; i < n; ++i)
+            {
+                for (int j = 0; j < m; ++j)
+                {
+                    Console.Write($"a[{i},{j}]= ");
+                    a[i, j] = int.Parse(Console.ReadLine());
+                }
+            }
+            return a;
+        }
+
+        static void Print2DInt(int[,] a)
+        {
+            for (int i = 0; i < a.GetLength(0); ++i)
+            {
+                for (int j = 0; j < a.GetLength(1); ++j)
+                    Console.Write("{0,5} ", a[i, j]);
+                Console.WriteLine();
+            }
+        }
+    }
+}
