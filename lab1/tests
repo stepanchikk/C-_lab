@@ -1,0 +1,76 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using lab1;
+
+namespace Lab1_Tests
+{
+    [TestClass]
+    public class UnitTest1
+    {
+        [TestMethod]
+        public void TestCalculateDistance()
+        {
+            // Перевіряємо єгипетський трикутник (катети 3 і 4, гіпотенуза має бути 5)
+            double actual = Program.CalculateDistance(0, 0, 3, 4);
+            Assert.AreEqual(5.0, actual, 0.0001, "Відстань розраховано неправильно");
+
+            // Перевіряємо збіг точок (відстань 0)
+            double actualZero = Program.CalculateDistance(5, 5, 5, 5);
+            Assert.AreEqual(0.0, actualZero, 0.0001);
+        }
+
+        [TestMethod]
+        public void TestIsOdd()
+        {
+            Assert.IsTrue(Program.IsOdd(7), "7 має бути непарним");
+            Assert.IsTrue(Program.IsOdd(-3), "-3 має бути непарним");
+            Assert.IsFalse(Program.IsOdd(10), "10 має бути парним");
+            Assert.IsFalse(Program.IsOdd(0), "0 має бути парним");
+        }
+
+        [TestMethod]
+        public void TestCheckArea()
+        {
+            // Точка всередині
+            Assert.AreEqual("Так (всередині)", Program.CheckArea(5, 0));
+            // Точка зліва (поза областю)
+            Assert.AreEqual("Ні (поза областю)", Program.CheckArea(-5, 0));
+            // Точка рівно на внутрішньому колі
+            Assert.AreEqual("На межі", Program.CheckArea(3, 0));
+            // Точка на осі Y між колами
+            Assert.AreEqual("На межі", Program.CheckArea(0, 5));
+        }
+
+        [TestMethod]
+        public void TestGetCardName()
+        {
+            Assert.AreEqual("шістка", Program.GetCardName(6));
+            Assert.AreEqual("валет", Program.GetCardName(11));
+            Assert.AreEqual("туз", Program.GetCardName(14));
+            Assert.AreEqual("Помилка", Program.GetCardName(15));
+        }
+
+        [TestMethod]
+        public void TestCubeOfDifference()
+        {
+            // (5 - 2)^3 = 27
+            Assert.AreEqual(27.0, Program.CubeOfDifference(5, 2), 0.0001);
+            // (1 - 4)^3 = -27
+            Assert.AreEqual(-27.0, Program.CubeOfDifference(1, 4), 0.0001);
+            // (2.5 - 2.5)^3 = 0
+            Assert.AreEqual(0.0, Program.CubeOfDifference(2.5, 2.5), 0.0001);
+        }
+
+        [TestMethod]
+        public void TestCalculateExpression()
+        {
+            // a=0, b=0 => 0/1 + 0/1 = 0
+            Assert.AreEqual(0.0, Program.CalculateExpression(0, 0), 0.0001);
+
+            // a=1, b=1 => 1/2 + 1/2 = 1
+            Assert.AreEqual(1.0, Program.CalculateExpression(1, 1), 0.0001);
+
+            // a=2, b=3 => 2/5 + 3/10 = 0.4 + 0.3 = 0.7
+            Assert.AreEqual(0.7, Program.CalculateExpression(2, 3), 0.0001);
+        }
+    }
+}
