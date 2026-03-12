@@ -1,0 +1,27 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using lab2;
+
+namespace Lab2_Tests
+{
+    [TestClass]
+    public class UnitTest1
+    {
+        [TestMethod]
+        public void Test_Task1_ReplaceElements()
+        {
+            // 1. Arrange
+            // Масив: від'ємні, додатні, кратні і не кратні числа
+            int[] arr = { -5, -6, 2, -9, -1 };
+            int k = 3; // Перевіряємо на кратність трьом
+
+            
+            int[] expected = { 5, -6, 2, -9, 1 };
+
+            // 2. Act
+            Program.Task1_ReplaceElements(arr, k);
+
+            // 3. Assert
+            CollectionAssert.AreEqual(expected, arr, "Елементи масиву замінено неправильно!");
+        }
+    }
+}
