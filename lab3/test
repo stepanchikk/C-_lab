@@ -1,0 +1,23 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using lab3;
+
+namespace Lab3_Tests
+{
+    [TestClass]
+    public class RectangleTests
+    {
+        [TestMethod]
+        public void TestRectangleLogic()
+        {
+            Rectangle rect = new Rectangle(4, 5, 1);
+            Assert.AreEqual(20, rect.Area());
+            Assert.AreEqual(18, rect.Perimeter());
+            Assert.IsFalse(rect.IsSquare());
+
+            Rectangle square = new Rectangle(3, 3, 2);
+            Assert.AreEqual(9, square.Area());
+            Assert.AreEqual(12, square.Perimeter());
+            Assert.IsTrue(square.IsSquare());
+        }
+    }
+}
