@@ -1,0 +1,172 @@
+using System;
+using System.Linq;
+
+namespace lab3
+{
+    public class Rectangle
+    {
+        protected int a, b;
+        protected int c;
+
+        public Rectangle(int a, int b, int c)
+        {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+        }
+
+        public int A
+        {
+            get { return a; }
+            set { a = value; }
+        }
+
+        public int B
+        {
+            get { return b; }
+            set { b = value; }
+        }
+
+        public int Color
+        {
+            get { return c; }
+        }
+
+        public void PrintSides()
+        {
+            Console.WriteLine($"Сторони: a = {a}, b = {b}");
+        }
+
+        public int Perimeter()
+        {
+            return 2 * (a + b);
+        }
+
+        public int Area()
+        {
+            return a * b;
+        }
+
+        public bool IsSquare()
+        {
+            return a == b;
+        }
+
+        public override string ToString()
+        {
+            return $"Прямокутник [Сторони: {a}x{b}, Колір: {c}, Площа: {Area()}, Периметр: {Perimeter()}, Квадрат: {(IsSquare() ? "Так" : "Ні")}]";
+        }
+    }
+
+    class Place
+    {
+        public string Name { get; set; }
+
+        public Place(string name)
+        {
+            Name = name;
+        }
+
+        public virtual void Show()
+        {
+            Console.WriteLine($"[Місце] Назва: {Name}");
+        }
+    }
+
+    class Region : Place
+    {
+        public int Population { get; set; }
+
+        public Region(string name, int population) : base(name)
+        {
+            Population = population;
+        }
+
+        public override void Show()
+        {
+            Console.WriteLine($"[Область] Назва: {Name}, Населення: {Population} осіб");
+        }
+    }
+
+    class City : Place
+    {
+        public bool HasAirport { get; set; }
+
+        public City(string name, bool hasAirport) : base(name)
+        {
+            HasAirport = hasAirport;
+        }
+
+        public override void Show()
+        {
+            Console.WriteLine($"[Місто] Назва: {Name}, Аеропорт: {(HasAirport ? "Є" : "Немає")}");
+        }
+    }
+
+    class Metropolis : City
+    {
+        public int MetroStations { get; set; }
+
+        public Metropolis(string name, bool hasAirport, int metroStations) : base(name, hasAirport)
+        {
+            MetroStations = metroStations;
+        }
+
+        public override void Show()
+        {
+            Console.WriteLine($"[Мегаполіс] Назва: {Name}, Аеропорт: {(HasAirport ? "Є" : "Немає")}, Станцій метро: {MetroStations}");
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine("=== ЗАВДАННЯ 1.3: ПРЯМОКУТНИКИ ===");
+
+            Rectangle[] rectangles = new Rectangle[]
+            {
+                new Rectangle(4, 5, 1),
+                new Rectangle(3, 3, 2),
+                new Rectangle(6, 2, 1),
+                new Rectangle(10, 10, 3),
+                new Rectangle(2, 8, 2)
+            };
+
+            Console.WriteLine("\n-- Впорядковано за кольором:");
+            foreach (var rect in rectangles.OrderBy(r => r.Color)) Console.WriteLine(rect);
+
+            Console.WriteLine("\n-- Впорядковано за площею:");
+            foreach (var rect in rectangles.OrderBy(r => r.Area())) Console.WriteLine(rect);
+
+            Console.WriteLine("\n-- Впорядковано за периметром:");
+            foreach (var rect in rectangles.OrderBy(r => r.Perimeter())) Console.WriteLine(rect);
+
+            int squareCount = rectangles.Count(r => r.IsSquare());
+            Console.WriteLine($"\nКількість квадратів у масиві: {squareCount}");
+
+            Console.WriteLine("\n\n=== ЗАВДАННЯ 2.8: ІЄРАРХІЯ КЛАСІВ ===");
+
+            Place[] places = new Place[]
+            {
+                new City("Чернівці", true),
+                new Place("Парк 'Жовтневий'"),
+                new Metropolis("Київ", true, 52),
+                new Region("Чернівецька", 890000),
+                new City("Коломия", false)
+            };
+
+            Console.WriteLine("\n-- Впорядковано за типами класу:");
+            var sortedPlaces = places.OrderBy(p => p.GetType().Name);
+
+            foreach (var place in sortedPlaces)
+            {
+                place.Show();
+            }
+
+            Console.ReadLine();
+        }
+    }
+}
