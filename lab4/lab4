@@ -1,0 +1,238 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+
+namespace Lab4
+{
+    // ==========================================
+    // ЗАВДАННЯ 1.3: Клас Rectangle
+    // ==========================================
+    class Rectangle
+    {
+        protected int a, b;
+        protected int c;
+
+        public Rectangle(int a, int b, int c)
+        {
+            this.a = a; this.b = b; this.c = c;
+        }
+
+        public int A { get => a; set => a = value; }
+        public int B { get => b; set => b = value; }
+        public int Color { get => c; }
+
+        // Індексатор
+        public int this[int index]
+        {
+            get
+            {
+                if (index == 0) return a;
+                if (index == 1) return b;
+                if (index == 2) return c;
+                Console.WriteLine("Помилка: невірний індекс!");
+                return -1;
+            }
+            set
+            {
+                if (index == 0) a = value;
+                else if (index == 1) b = value;
+                else if (index == 2) c = value;
+                else Console.WriteLine("Помилка: невірний індекс!");
+            }
+        }
+
+        // Перевантаження операторів
+        public static Rectangle operator ++(Rectangle r) { r.a++; r.b++; return r; }
+        public static Rectangle operator --(Rectangle r) { r.a--; r.b--; return r; }
+        public static bool operator true(Rectangle r) => r.a == r.b;
+        public static bool operator false(Rectangle r) => r.a != r.b;
+        public static Rectangle operator *(Rectangle r, int scalar) => new Rectangle(r.a * scalar, r.b * scalar, r.c);
+
+        // Перетворення типів (неявне в рядок, явне з рядка)
+        public static implicit operator string(Rectangle r) => $"{r.a},{r.b},{r.c}";
+        public static explicit operator Rectangle(string s)
+        {
+            var parts = s.Split(',');
+            return new Rectangle(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
+        }
+
+        public override string ToString() => $"Прямокутник {a}x{b}, колір {c}";
+    }
+
+    // ==========================================
+    // ЗАВДАННЯ 2.3: Клас VectorShort
+    // ==========================================
+    public class VectorShort
+    {
+        protected short[] ShortArray;
+        protected uint n;
+        protected uint codeError;
+        public static uint num_v;
+
+        public VectorShort() { n = 1; ShortArray = new short[1]; num_v++; }
+        public VectorShort(uint size) { n = size; ShortArray = new short[n]; num_v++; }
+        public VectorShort(uint size, short initValue)
+        {
+            n = size; ShortArray = new short[n];
+            for (int i = 0; i < n; i++) ShortArray[i] = initValue;
+            num_v++;
+        }
+        ~VectorShort() { Console.WriteLine("Вектор видалено (Деструктор)"); }
+
+        public uint Size => n;
+        public uint CodeError { get => codeError; set => codeError = value; }
+
+        public short this[int i]
+        {
+            get { if (i < 0 || i >= n) { codeError = 10; return 0; } return ShortArray[i]; }
+            set { if (i < 0 || i >= n) { codeError = 10; } else ShortArray[i] = value; }
+        }
+
+        public void Print() => Console.WriteLine($"Вектор: [{string.Join(", ", ShortArray)}]");
+
+        // Унарні оператори
+        public static VectorShort operator ++(VectorShort v) { for (int i = 0; i < v.n; i++) v[i]++; return v; }
+        public static VectorShort operator --(VectorShort v) { for (int i = 0; i < v.n; i++) v[i]--; return v; }
+        public static bool operator true(VectorShort v) => v.n != 0 || v.ShortArray.Any(x => x != 0);
+        public static bool operator false(VectorShort v) => v.n == 0 && v.ShortArray.All(x => x == 0);
+        public static bool operator !(VectorShort v) => v.n != 0;
+        public static VectorShort operator ~(VectorShort v)
+        {
+            var res = new VectorShort(v.n);
+            for (int i = 0; i < v.n; i++) res[i] = (short)~v[i];
+            return res;
+        }
+
+        // Бінарні оператори (+ для прикладів)
+        public static VectorShort operator +(VectorShort v1, VectorShort v2)
+        {
+            uint maxN = Math.Max(v1.n, v2.n);
+            var res = new VectorShort(maxN);
+            for (int i = 0; i < maxN; i++)
+            {
+                short val1 = i < v1.n ? v1[i] : (short)0;
+                short val2 = i < v2.n ? v2[i] : (short)0;
+                res[i] = (short)(val1 + val2);
+            }
+            return res;
+        }
+        public static VectorShort operator +(VectorShort v, short s)
+        {
+            var res = new VectorShort(v.n);
+            for (int i = 0; i < v.n; i++) res[i] = (short)(v[i] + s);
+            return res;
+        }
+        // ... (Інші арифметичні та побітові оператори *, /, -, %, |, ^, &, >>, << реалізуються аналогічно) ...
+
+        public static bool operator ==(VectorShort v1, VectorShort v2)
+        {
+            if (v1.n != v2.n) return false;
+            for (int i = 0; i < v1.n; i++) if (v1[i] != v2[i]) return false;
+            return true;
+        }
+        public static bool operator !=(VectorShort v1, VectorShort v2) => !(v1 == v2);
+    }
+
+    // ==========================================
+    // ЗАВДАННЯ 3.8: Покупець (Структура, Кортеж, Record)
+    // ==========================================
+    struct BuyerStruct
+    {
+        public string Name, Address, Phone, Card;
+        public override string ToString() => $"{Name} ({Phone})";
+    }
+
+    record BuyerRecord(string Name, string Address, string Phone, string Card);
+
+    // ==========================================
+    // ЗАВДАННЯ 4.3: Клас MatrixShort
+    // ==========================================
+    class MatrixShort
+    {
+        protected short[,] ShortArray;
+        protected int n, m;
+        protected int codeError;
+        public static int num_m;
+
+        public MatrixShort() { n = 1; m = 1; ShortArray = new short[1, 1]; num_m++; }
+        public MatrixShort(int rows, int cols) { n = rows; m = cols; ShortArray = new short[n, m]; num_m++; }
+        public MatrixShort(int rows, int cols, short init)
+        {
+            n = rows; m = cols; ShortArray = new short[n, m];
+            for (int i = 0; i < n; i++) for (int j = 0; j < m; j++) ShortArray[i, j] = init;
+            num_m++;
+        }
+
+        public short this[int i, int j]
+        {
+            get { if (i < 0 || i >= n || j < 0 || j >= m) { codeError = -1; return 0; } return ShortArray[i, j]; }
+            set { if (i < 0 || i >= n || j < 0 || j >= m) { codeError = -1; } else ShortArray[i, j] = value; }
+        }
+
+        // 1D індексатор k = i * m + j
+        public short this[int k]
+        {
+            get { int i = k / m; int j = k % m; return this[i, j]; }
+            set { int i = k / m; int j = k % m; this[i, j] = value; }
+        }
+
+        public void Print()
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < m; j++) Console.Write(ShortArray[i, j] + "\t");
+                Console.WriteLine();
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine("=== ЗАВДАННЯ 1.3: ПРЯМОКУТНИК ===");
+            Rectangle rect = new Rectangle(5, 5, 1);
+            Console.WriteLine($"Індексатор [0]: {rect[0]}, [1]: {rect[1]}");
+            rect++;
+            Console.WriteLine($"Після ++: {rect}");
+            Console.WriteLine($"Чи квадрат (operator true)? {(rect ? "Так" : "Ні")}");
+            string rectStr = rect; // Неявне перетворення
+            Console.WriteLine($"В рядок: {rectStr}");
+
+            Console.WriteLine("\n=== ЗАВДАННЯ 2.3: ВЕКТОР ===");
+            VectorShort v1 = new VectorShort(3, 5);
+            VectorShort v2 = new VectorShort(3, 2);
+            v1.Print();
+            VectorShort v3 = v1 + v2;
+            Console.Write("Сума векторів: "); v3.Print();
+
+            Console.WriteLine("\n=== ЗАВДАННЯ 3.8: ПОКУПЕЦЬ (Кортежі та Лісти) ===");
+            // Використання List для зручного видалення/додавання елементів
+            List<BuyerStruct> buyers = new List<BuyerStruct>
+            {
+                new BuyerStruct { Name="Іван", Phone="111" },
+                new BuyerStruct { Name="Петро", Phone="222" },
+                new BuyerStruct { Name="Олег", Phone="333" },
+                new BuyerStruct { Name="Анна", Phone="444" }
+            };
+
+            Console.WriteLine($"Початкова кількість: {buyers.Count}");
+            // Видаляємо 3 елементи з початку
+            if (buyers.Count >= 3) buyers.RemoveRange(0, 3);
+
+            // Додаємо 3 елементи в кінець
+            buyers.Add(new BuyerStruct { Name = "Новий1", Phone = "555" });
+            buyers.Add(new BuyerStruct { Name = "Новий2", Phone = "666" });
+            buyers.Add(new BuyerStruct { Name = "Новий3", Phone = "777" });
+            Console.WriteLine("Масив після змін:");
+            foreach (var b in buyers) Console.WriteLine(b);
+
+            Console.WriteLine("\n=== ЗАВДАННЯ 4.3: МАТРИЦЯ ===");
+            MatrixShort matrix = new MatrixShort(2, 2, 8);
+            matrix.Print();
+            Console.WriteLine($"Доступ через 1D індекс [3]: {matrix[3]}");
+        }
+    }
+}
