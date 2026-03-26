@@ -4,28 +4,69 @@ using Lab4;
 namespace Lab4_Tests
 {
     [TestClass]
-    public class VectorShortTests
+    public class RectangleTests
     {
         [TestMethod]
-        public void TestVectorOperators()
+        public void TestIndexer()
         {
-            
-            VectorShort v1 = new VectorShort(3, 5);
-            VectorShort v2 = new VectorShort(3, 2);
+            Rectangle rect = new Rectangle(5, 10, 1);
 
-        
-            VectorShort v3 = v1 + v2;
+            // Перевірка читання через індексатор
+            Assert.AreEqual(5, rect[0], "Індексатор [0] має повертати сторону a");
+            Assert.AreEqual(10, rect[1], "Індексатор [1] має повертати сторону b");
+            Assert.AreEqual(1, rect[2], "Індексатор [2] має повертати колір");
 
-            Assert.AreEqual((short)7, v3[0], "Оператор + працює неправильно");
-            Assert.AreEqual((short)7, v3[2], "Оператор + працює неправильно для останнього елемента");
+            // Перевірка запису через індексатор
+            rect[0] = 7;
+            Assert.AreEqual(7, rect[0], "Сторона 'a' не змінилася після запису через індексатор");
+        }
 
-            Assert.IsTrue(v1 != v2, "Вектори мають бути різними");
+        [TestMethod]
+        public void TestIncrementOperator()
+        {
+            Rectangle rect = new Rectangle(2, 3, 1);
+            rect++; // Використовуємо перевантажений оператор
 
-            VectorShort v4 = new VectorShort(3, 5);
-            Assert.IsTrue(v1 == v4, "Вектори з однаковими даними мають бути рівними");
+            Assert.AreEqual(3, rect[0], "Сторона 'a' мала збільшитися на 1");
+            Assert.AreEqual(4, rect[1], "Сторона 'b' мала збільшитися на 1");
+        }
 
-            v2++;
-            Assert.AreEqual((short)3, v2[1], "Оператор ++ працює неправильно");
+        [TestMethod]
+        public void TestTrueFalseOperators()
+        {
+            Rectangle square = new Rectangle(5, 5, 1);
+            Rectangle notSquare = new Rectangle(4, 5, 1);
+
+            // Оператор true має повертати істину, якщо це квадрат (a == b)
+            Assert.IsTrue(square ? true : false, "Для квадрата оператор true має спрацювати");
+            Assert.IsFalse(notSquare ? true : false, "Для звичайного прямокутника має спрацювати false");
+        }
+
+        [TestMethod]
+        public void TestMultiplicationOperator()
+        {
+            Rectangle rect = new Rectangle(2, 4, 1);
+            Rectangle result = rect * 3; // Множимо на скаляр 3
+
+            Assert.AreEqual(6, result[0], "Сторона 'a' мала помножитися на 3");
+            Assert.AreEqual(12, result[1], "Сторона 'b' мала помножитися на 3");
+            Assert.AreEqual(1, result[2], "Колір не мав змінитися");
+        }
+
+        [TestMethod]
+        public void TestTypeConversions()
+        {
+            Rectangle rect = new Rectangle(8, 9, 2);
+
+            // Неявне перетворення в рядок
+            string strRect = rect;
+            Assert.AreEqual("8,9,2", strRect, "Неявне перетворення в рядок працює неправильно");
+
+            // Явне перетворення з рядка
+            Rectangle parsedRect = (Rectangle)"3,4,5";
+            Assert.AreEqual(3, parsedRect[0]);
+            Assert.AreEqual(4, parsedRect[1]);
+            Assert.AreEqual(5, parsedRect[2]);
         }
     }
 }
