@@ -1,0 +1,180 @@
+using System;
+using System.Linq;
+
+namespace Lab5
+{
+    // ЗАВДАННЯ 1 ТА 2: Ієрархія (Місце -> Область / Місто -> Мегаполіс)
+
+    public abstract class Place
+    {
+        public string Name { get; set; }
+        public int Population { get; set; }
+
+        // 3 конструктори
+        public Place() { Name = "Невідомо"; Population = 0; Console.WriteLine("Викликано конструктор Place()"); }
+        public Place(string name) { Name = name; Population = 0; Console.WriteLine("Викликано конструктор Place(string)"); }
+        public Place(string name, int pop) { Name = name; Population = pop; Console.WriteLine("Викликано конструктор Place(string, int)"); }
+
+        // Деструктор
+        ~Place() { Console.WriteLine($"Деструктор Place: {Name}"); }
+
+        public abstract void Show();
+
+        public virtual void PrintCategory() => Console.WriteLine("Категорія: Невизначене місце");
+
+        public void PrintBaseInfo() => Console.WriteLine($"Базова інформація -> Назва: {Name}, Населення: {Population}");
+    }
+
+    public class Region : Place
+    {
+        public int NumberOfDistricts { get; set; }
+
+        public Region() : base() { NumberOfDistricts = 0; Console.WriteLine("Викликано конструктор Region()"); }
+        public Region(string name, int pop) : base(name, pop) { NumberOfDistricts = 0; Console.WriteLine("Викликано конструктор Region(string, int)"); }
+        public Region(string name, int pop, int dist) : base(name, pop) { NumberOfDistricts = dist; Console.WriteLine("Викликано конструктор Region(string, int, int)"); }
+
+        ~Region() { Console.WriteLine($"Деструктор Region: {Name}"); }
+
+        public override void Show() => Console.WriteLine($"[Область] {Name}, Населення: {Population}, Районів: {NumberOfDistricts}");
+
+        public override void PrintCategory() => Console.WriteLine("Категорія: Адміністративна одиниця (Область)");
+    }
+
+    public class City : Place
+    {
+        public bool HasAirport { get; set; }
+
+        public City() : base() { HasAirport = false; Console.WriteLine("Викликано конструктор City()"); }
+        public City(string name, int pop) : base(name, pop) { HasAirport = false; Console.WriteLine("Викликано конструктор City(string, int)"); }
+        public City(string name, int pop, bool airport) : base(name, pop) { HasAirport = airport; Console.WriteLine("Викликано конструктор City(string, int, bool)"); }
+
+        ~City() { Console.WriteLine($"Деструктор City: {Name}"); }
+
+        public override void Show() => Console.WriteLine($"[Місто] {Name}, Населення: {Population}, Аеропорт: {(HasAirport ? "Є" : "Немає")}");
+
+        public override void PrintCategory() => Console.WriteLine("Категорія: Населений пункт (Місто)");
+    }
+
+    public class Megalopolis : City
+    {
+        public int MetroStations { get; set; }
+
+        public Megalopolis() : base() { MetroStations = 0; Console.WriteLine("Викликано конструктор Megalopolis()"); }
+        public Megalopolis(string name, int pop, bool airport) : base(name, pop, airport) { MetroStations = 0; Console.WriteLine("Викликано конструктор Megalopolis(...)"); }
+        public Megalopolis(string name, int pop, bool airport, int metro) : base(name, pop, airport) { MetroStations = metro; Console.WriteLine("Викликано конструктор Megalopolis(повний)"); }
+
+        ~Megalopolis() { Console.WriteLine($"Деструктор Megalopolis: {Name}"); }
+
+        public override void Show() => Console.WriteLine($"[Мегаполіс] {Name}, Населення: {Population}, Аеропорт: {(HasAirport ? "Є" : "Немає")}, Станцій метро: {MetroStations}");
+    }
+
+    // ЗАВДАННЯ 3: Ієрархія Видання (Книга, Стаття, Ел. ресурс)
+
+    public abstract class Publication
+    {
+        public string Title { get; set; }
+        public string AuthorSurname { get; set; }
+
+        protected Publication(string title, string author) { Title = title; AuthorSurname = author; }
+
+        public abstract void Show();
+
+        // Метод для пошуку
+        public bool IsAuthor(string searchSurname) =>
+            AuthorSurname.Equals(searchSurname, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public class Book : Publication
+    {
+        public int Year { get; set; }
+        public string Publisher { get; set; }
+
+        public Book(string title, string author, int year, string pub) : base(title, author)
+        { Year = year; Publisher = pub; }
+
+        public override void Show() => Console.WriteLine($"Книга: '{Title}', Автор: {AuthorSurname}, Рік: {Year}, Вид-во: {Publisher}");
+    }
+
+    public class Article : Publication
+    {
+        public string Journal { get; set; }
+        public int Number { get; set; }
+        public int Year { get; set; }
+
+        public Article(string title, string author, string journal, int num, int year) : base(title, author)
+        { Journal = journal; Number = num; Year = year; }
+
+        public override void Show() => Console.WriteLine($"Стаття: '{Title}', Автор: {AuthorSurname}, Журнал: {Journal} #{Number}, Рік: {Year}");
+    }
+
+    public class ElectronicResource : Publication
+    {
+        public string Link { get; set; }
+        public string Annotation { get; set; }
+
+        public ElectronicResource(string title, string author, string link, string ann) : base(title, author)
+        { Link = link; Annotation = ann; }
+
+        public override void Show() => Console.WriteLine($"Ел.ресурс: '{Title}', Автор: {AuthorSurname}, URL: {Link}, Анотація: {Annotation}");
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine("=== ЗАВДАННЯ 1 ТА 2 ===");
+            Place[] places = new Place[]
+            {
+                new Region("Київська", 2900000, 7),
+                new Region("Львівська", 2500000, 7),
+                new City("Чернівці", 260000, true),
+                new Megalopolis("Київ", 2950000, true, 52),
+                new Megalopolis("Харків", 1400000, true, 30)
+            };
+
+            Console.WriteLine("\n--- Впорядкування масиву за населенням (полем базового класу) ---");
+            var sortedPlaces = places.OrderBy(p => p.Population).ToArray();
+
+            foreach (var p in sortedPlaces)
+            {
+                p.PrintBaseInfo(); // Не віртуальний
+                p.PrintCategory(); // Віртуальний
+                p.Show();          // Абстрактний
+                Console.WriteLine(new string('-', 30));
+            }
+
+
+            Console.WriteLine("\n=== ЗАВДАННЯ 3 ===");
+            Publication[] publications = new Publication[]
+            {
+                new Book("Кобзар", "Шевченко", 1840, "Основа"),
+                new Book("Маруся", "Квітка-Основ'яненко", 1834, "Генеза"),
+                new Article("Спадкування в C#", "Лазорик", "Програмування", 5, 2026),
+                new ElectronicResource("Вікіпедія", "Громада", "wikipedia.org", "Вільна енциклопедія")
+            };
+
+            Console.WriteLine("Всі видання в каталозі:");
+            foreach (var pub in publications) pub.Show();
+
+            string searchAuthor = "Сандюк";
+            Console.WriteLine($"\n--- Пошук видань автора '{searchAuthor}': ---");
+            foreach (var pub in publications)
+            {
+                if (pub.IsAuthor(searchAuthor))
+                    pub.Show();
+            }
+
+            Console.WriteLine("\n=== ДЕМОНСТРАЦІЯ ДЕСТРУКТОРІВ ===");
+            // Звільняємо посилання
+            places = null;
+            sortedPlaces = null;
+            // Штучно викликаємо збирач сміття, щоб консоль вивела повідомлення з деструкторів
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            Console.ReadLine();
+        }
+    }
+}
