@@ -1,36 +1,53 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace lab10
 {
-  //Оголошення делегата, на основі якого буде визначена подія 
+    // Оголошення делегата
     public delegate void FacultyEventHandler(object sender, FacultyEventArgs e);
 
-    //Клас, що задає вхідні й вихідні аргументи події 
+    // 1. ПРІОРИТЕТ: Перелічення для пріоритетів подій
+    public enum EventPriority
+    {
+        Low,
+        Normal,
+        High
+    }
+
+    // Клас аргументів події
     public class FacultyEventArgs : EventArgs
     {
         public int Day { get; }
         public string EventName { get; }
-        public string Result { get; set; }
+        public EventPriority Priority { get; } // Додано пріоритет
+        public string Result { get; set; } = string.Empty;
 
-        public FacultyEventArgs(int day, string eventName)
+        public FacultyEventArgs(int day, string eventName, EventPriority priority)
         {
             Day = day;
             EventName = eventName;
+            Priority = priority;
         }
     }
 
-    //Клас, у якім ініціюється подія
+    // Клас факультету
     public class Faculty
     {
         public string Name { get; }
         public int Days { get; }
 
-       // Оголошення події з event
-        public event FacultyEventHandler FacultyEvent;
+        public event FacultyEventHandler? FacultyEvent;
 
         private Random rnd = new Random();
-        private List<string> resultServices;
+        private List<string> resultServices = new List<string>();
+
+        // 2. ЧЕРГА: Черга для очікування обробки подій
+        private Queue<FacultyEventArgs> eventQueue = new Queue<FacultyEventArgs>();
+
+        // 4. СТАТИСТИКА: Словник для збереження кількості подій
+        public Dictionary<string, int> Statistics { get; } = new Dictionary<string, int>();
 
         public Faculty(string name, int days)
         {
@@ -38,53 +55,91 @@ namespace lab10
             Days = days;
         }
 
-        // Метод, де запалюється подія і викликаються оброблювачі
-        protected virtual void OnFacultyEvent(FacultyEventArgs e)
+        // 3. АСИНХРОННІСТЬ: Асинхронний метод обробки однієї події
+        protected async Task ProcessEventAsync(FacultyEventArgs e)
         {
-            Console.WriteLine($"\n--- День {e.Day}: На факультеті '{Name}' розпочалася подія: [{e.EventName}] ---");
+            Console.WriteLine($"\n--- День {e.Day} | Пріоритет: [{e.Priority}] | На факультеті '{Name}' розпочалася подія: [{e.EventName}] ---");
 
             if (FacultyEvent != null)
             {
-              
                 Delegate[] handlers = FacultyEvent.GetInvocationList();
-                resultServices = new List<string>();
+                resultServices.Clear();
 
                 foreach (FacultyEventHandler handler in handlers)
                 {
-                    handler(this, e); 
+                    handler(this, e);
                     if (!string.IsNullOrEmpty(e.Result))
                     {
                         resultServices.Add(e.Result);
+                        e.Result = string.Empty; // Очищаємо для наступного слухача
                     }
                 }
+
+                // Виводимо реакції
+                foreach (string res in resultServices)
+                {
+                    Console.WriteLine(res);
+                }
             }
+
+            // Імітуємо час, потрібний на проведення події
+            await Task.Delay(500);
         }
 
-        // Моделювання життя факультету
-        public void LifeOurFaculty()
+        // Асинхронне моделювання життя факультету
+        public async Task LifeOurFacultyAsync()
         {
-            string[] possibleEvents = { "Модульний контроль", "Студентська вечірка", "Перевірка з деканату", "Наукова конференція" };
+            // Події тепер мають закріплений пріоритет
+            var possibleEvents = new List<(string Name, EventPriority Priority)>
+            {
+                ("Модульний контроль", EventPriority.High),
+                ("Студентська вечірка", EventPriority.Low),
+                ("Перевірка з деканату", EventPriority.High),
+                ("Наукова конференція", EventPriority.Normal)
+            };
 
             for (int day = 1; day <= Days; day++)
             {
-                // З імовірністю 40% кожного дня щось відбувається
-                if (rnd.NextDouble() < 0.4)
-                {
-                    string randomEvent = possibleEvents[rnd.Next(possibleEvents.Length)];
-                    FacultyEventArgs e = new FacultyEventArgs(day, randomEvent);
-                    OnFacultyEvent(e);
+                List<FacultyEventArgs> todaysEvents = new List<FacultyEventArgs>();
 
-                    if (resultServices != null)
+                // З імовірністю 50% генеруємо від 1 до 3 подій за день
+                if (rnd.NextDouble() < 0.5)
+                {
+                    int eventsCount = rnd.Next(1, 3);
+                    for (int i = 0; i < eventsCount; i++)
                     {
-                        foreach (string res in resultServices)
-                        {
-                            Console.WriteLine(res);
-                        }
+                        var ev = possibleEvents[rnd.Next(possibleEvents.Count)];
+                        todaysEvents.Add(new FacultyEventArgs(day, ev.Name, ev.Priority));
+                    }
+                }
+
+                if (todaysEvents.Count > 0)
+                {
+                    // Сортуємо події дня за пріоритетом (від High до Low)
+                    todaysEvents = todaysEvents.OrderByDescending(e => e.Priority).ToList();
+
+                    // Додаємо відсортовані події у ЧЕРГУ
+                    foreach (var ev in todaysEvents)
+                    {
+                        eventQueue.Enqueue(ev);
+
+                        // Записуємо статистику
+                        if (!Statistics.ContainsKey(ev.EventName))
+                            Statistics[ev.EventName] = 0;
+                        Statistics[ev.EventName]++;
                     }
                 }
                 else
                 {
                     Console.WriteLine($"День {day}: Звичайний навчальний день. Усі на парах.");
+                    await Task.Delay(300); // Імітація часу звичайного дня
+                }
+
+                // Обробляємо події з черги асинхронно
+                while (eventQueue.Count > 0)
+                {
+                    var currentEvent = eventQueue.Dequeue();
+                    await ProcessEventAsync(currentEvent);
                 }
             }
         }
@@ -100,13 +155,11 @@ namespace lab10
             this.faculty = faculty;
         }
 
-      // Підключення до спостереження за подіями 
         public void On()
         {
             faculty.FacultyEvent += new FacultyEventHandler(HandleEvent);
         }
 
-        // Відключення 
         public void Off()
         {
             faculty.FacultyEvent -= new FacultyEventHandler(HandleEvent);
@@ -115,8 +168,6 @@ namespace lab10
         public abstract void HandleEvent(object sender, FacultyEventArgs e);
     }
 
-    //Конкретні підписники, які реагують на події
-
     public class Student : FacultyMember
     {
         public Student(Faculty faculty) : base(faculty) { }
@@ -124,17 +175,11 @@ namespace lab10
         public override void HandleEvent(object sender, FacultyEventArgs e)
         {
             if (e.EventName == "Модульний контроль")
-            {
                 e.Result = rnd.Next(0, 10) > 3 ? "  > Студенти: Більшість успішно здали модулі!" : "  > Студенти: Доведеться йти на перездачу...";
-            }
             else if (e.EventName == "Студентська вечірка")
-            {
                 e.Result = "  > Студенти: Чудово відпочили після пар!";
-            }
             else
-            {
                 e.Result = "";
-            }
         }
     }
 
@@ -145,17 +190,11 @@ namespace lab10
         public override void HandleEvent(object sender, FacultyEventArgs e)
         {
             if (e.EventName == "Модульний контроль")
-            {
                 e.Result = "  > Викладачі: Перевіряють гори робіт та виставляють бали.";
-            }
             else if (e.EventName == "Наукова конференція")
-            {
                 e.Result = "  > Викладачі: Виступають з цікавими доповідями.";
-            }
             else
-            {
                 e.Result = "";
-            }
         }
     }
 
@@ -166,53 +205,59 @@ namespace lab10
         public override void HandleEvent(object sender, FacultyEventArgs e)
         {
             if (e.EventName == "Перевірка з деканату")
-            {
                 e.Result = rnd.Next(0, 10) > 4 ? "  > Деканат: Зауважень немає, навчальний процес іде за планом." : "  > Деканат: Виявлено порушення відвідуваності!";
-            }
             else
-            {
                 e.Result = "";
-            }
         }
     }
 
-   
     public class Lab10T
     {
-        public void Run()
+        // Змінено на асинхронний запуск
+        public async Task RunAsync()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.WriteLine("=== Проект: Життя факультету (Асинхронна версія з чергами) ===\n");
 
-            Console.WriteLine("=== Проект: Життя факультету ===\n");
-
-            
             Faculty itFaculty = new Faculty("Інформаційних Технологій", 10);
 
-           
             Student students = new Student(itFaculty);
             Professor professors = new Professor(itFaculty);
             Deanery deanery = new Deanery(itFaculty);
 
-           
             students.On();
             professors.On();
             deanery.On();
 
-           
-            itFaculty.LifeOurFaculty();
+            // Чекаємо завершення симуляції
+            await itFaculty.LifeOurFacultyAsync();
+
+            // Виведення статистики
+            Console.WriteLine("\n================ СТАТИСТИКА ЗА ПЕРІОД ================");
+            if (itFaculty.Statistics.Count == 0)
+            {
+                Console.WriteLine("За цей період не відбулося жодної події.");
+            }
+            else
+            {
+                foreach (var stat in itFaculty.Statistics.OrderByDescending(x => x.Value))
+                {
+                    Console.WriteLine($"- {stat.Key}: {stat.Value} раз(ів)");
+                }
+            }
+            Console.WriteLine("======================================================");
 
             Console.WriteLine("\nМоделювання завершено.");
         }
     }
 
-   
     class Program
     {
-        static void Main(string[] args)
+        // Головний метод тепер асинхронний
+        static async Task Main(string[] args)
         {
-           
             Lab10T lab10task = new Lab10T();
-            lab10task.Run();
+            await lab10task.RunAsync();
 
             Console.ReadLine();
         }
