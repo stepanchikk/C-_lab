@@ -3,7 +3,7 @@ using System.Collections;
 using System.IO;
 using System.Text;
 
-namespace Lab9
+namespace Lab9_Variant23
 {
     class Program
     {
@@ -27,9 +27,9 @@ namespace Lab9
             {
                 Console.Clear();
                 Console.WriteLine("=== ЛАБОРАТОРНА РОБОТА №9 (Варіант 23) ===");
-                Console.WriteLine("1. Завдання 1.3: Stack");
-                Console.WriteLine("2. Завдання 2.3: Queue");
-                Console.WriteLine("3. Завдання 3: ArrayList");
+                Console.WriteLine("1. Завдання 1.3: Stack (Реверс літер)");
+                Console.WriteLine("2. Завдання 2.3: Queue (Голосні та приголосні)");
+                Console.WriteLine("3. Завдання 3: ArrayList (Вирішення задач 1 і 2)");
                 Console.WriteLine("4. Завдання 4: Hashtable (Інтерактивний каталог)");
                 Console.WriteLine("0. Вихід");
                 Console.Write("\nВаш вибір: ");
@@ -47,12 +47,12 @@ namespace Lab9
                     default: Console.WriteLine("Невірний пункт меню."); break;
                 }
 
-                Console.WriteLine("\nНатисніть будь-яку клавішу...");
+                Console.WriteLine("\nНатисніть будь-яку клавішу для повернення...");
                 Console.ReadKey();
             }
         }
 
-        // Створення базових файлів при першому запуску
+        // Створення базових тестових файлів при першому запуску програми
         private void InitializeFiles()
         {
             bool created = false;
@@ -73,8 +73,10 @@ namespace Lab9
             }
         }
 
+        // ================= ЗАВДАННЯ 1.3 (Stack) =================
         private void ExecuteTask1Stack()
         {
+            Console.WriteLine("--- Завдання 1.3 (Stack) ---");
             Stack stack = new Stack();
             string[] lines = File.ReadAllLines("t.txt", Encoding.UTF8);
 
@@ -88,8 +90,10 @@ namespace Lab9
             }
         }
 
+        // ================= ЗАВДАННЯ 2.3 (Queue) =================
         private void ExecuteTask2Queue()
         {
+            Console.WriteLine("--- Завдання 2.3 (Queue) ---");
             Queue vowelQueue = new Queue();
             Queue consonantQueue = new Queue();
             string vowels = "аеєиіїоуюяАЕЄИІЇОУЮЯ";
@@ -111,8 +115,28 @@ namespace Lab9
             Console.WriteLine();
         }
 
+        // ================= ЗАВДАННЯ 3 (ArrayList) =================
         private void ExecuteTask3ArrayList()
         {
+            Console.WriteLine("--- Завдання 3 (ArrayList) ---");
+
+            // Частина 1: Реверс літер (задача 1.3)
+            Console.WriteLine("[Частина 1: Реверс літер]");
+            string[] lines = File.ReadAllLines("t.txt", Encoding.UTF8);
+            foreach (string line in lines)
+            {
+                ArrayList charList = new ArrayList();
+                foreach (char ch in line) charList.Add(ch);
+
+                charList.Reverse();
+
+                Console.Write("Реверс: ");
+                foreach (char ch in charList) Console.Write(ch);
+                Console.WriteLine();
+            }
+
+            // Частина 2: Голосні та приголосні слова (задача 2.3)
+            Console.WriteLine("\n[Частина 2: Розподіл слів]");
             ArrayList vowelList = new ArrayList();
             ArrayList consonantList = new ArrayList();
             string vowels = "аеєиіїоуюяАЕЄИІЇОУЮЯ";
@@ -126,19 +150,18 @@ namespace Lab9
                 else consonantList.Add(word);
             }
 
-            Console.Write("Голосні (ArrayList): ");
+            Console.Write("Голосні: ");
             foreach (string w in vowelList) Console.Write(w + " ");
 
-            Console.Write("\nПриголосні (ArrayList): ");
+            Console.Write("\nПриголосні: ");
             foreach (string w in consonantList) Console.Write(w + " ");
             Console.WriteLine();
         }
 
-        // Інтерактивний музичний каталог на базі Hashtable
+        // ================= ЗАВДАННЯ 4 (Hashtable) =================
         private void ExecuteTask4Hashtable()
         {
             Hashtable catalog = new Hashtable();
-            // Базове наповнення для зручності тестування
             catalog.Add("Rock", new ArrayList { "AC/DC - Thunderstruck", "Queen - Bohemian Rhapsody" });
             catalog.Add("Pop", new ArrayList { "Michael Jackson - Billie Jean" });
 
